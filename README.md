@@ -1,5 +1,6 @@
 # admin_finder
 a simple tool to find admin control panel, multiple site in one time.
+by Black Python from NoB Cyber Army.
 
 this simple script written in python has only 2 basic options.
 --wordlist for selecting a wordlist to work with and (1 word a line)

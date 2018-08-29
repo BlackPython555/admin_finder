@@ -2,6 +2,10 @@
 
 import urllib2, httplib, argparse
 
+"""
+Simple Admin CP Finder by Black Python from NoB Cyber Army
+"""
+
 def checkAdmin(wordlist, sitelist):
     """
     wordlist: the file containing all words (admin dirs), 1 word a line.

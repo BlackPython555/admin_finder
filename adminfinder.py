@@ -1,54 +1,69 @@
-#! /usr/bin/python3
+#! /usr/bin/env python
 
-import urllib2, httplib, argparse
+# importing needed modules
+from urllib2 import urlopen, Request, HTTPError, URLError
+from os import system, name
+import socket
 
-"""
-Simple Admin CP Finder by Black Python from NoB Cyber Army
-"""
+def clear():
+    if name == 'nt': _ = system('cls')
+    else: _ = system('clear')
 
-def checkAdmin(wordlist, sitelist):
-    """
-    wordlist: the file containing all words (admin dirs), 1 word a line.
-    sitelist: the file containing all sites to scan, 1 site a line.
-    """
+def find_admin(wordlist, sitelist):
+    try:
+       words = open(wordlist, 'r').readlines()
+       sites = open(sitelist, 'r').readlines()
+    except IOError:
+       exit("One of your file was not found!")
 
-    dirlist = open(wordlist).readlines()
-    sites = open(sitelist).readlines()
+    if not words or not sites: exit('Wordlist or Sitelist is empty')
+    print("Searching...")
+
+    def _not_found_msg(site, word):
+        print "Not found: {}/{}".format(site.strip(), word.strip())
 
     def _check(site):
-        for n in dirlist:
+        found = []
+        for word in words:
             try:
-                urllib2.urlopen("{}/{}".format(site.strip(), n.strip())).info()
-            except urllib2.URLError:
+                req = Request("{}/{}".format(site.strip(), word.strip()))
+                resp = urlopen(req)
+            except HTTPError as e:
+                _not_found_msg(site, word)
                 continue
-            except urllib2.HTTPError:
+            except URLError as e:
+                _not_found_msg(site, word)
                 continue
-            except httplib.HTTPException:
-                continue
-            except IOError:
+            except socket.error as e:
+                _not_found_msg(site, word)
                 continue
             else:
-                print("[i] Possible: {}/{}".format(site.strip(), n.strip()))
-                open('./found.txt', 'a').write('{}/{}\n'.format(site.strip(), n.strip()))
+                print "\x1b[32;1mFound: {}/{}\x1b[0m".format(site.strip(), word.strip())
+                open("./found.txt", "a").write("{}/{}\n".format(site.strip(), word.strip()))
+                found.append("{}/{}".format(site.strip(), word.strip()))
+        clear()
+        banner()
+        print "Found sites:"
+        for n in found:
+            print n
 
     try:
         for site in sites:
             _check(site)
     except KeyboardInterrupt:
-        exit("\nUser Exited\n")
+        exit("User exit")
 
+def banner():
+    print "#####################################################"
+    print "#                                                   #"
+    print "#  Admin control panel finder v1.1 by Black Python  #"
+    print "#                                                   #"
+    print "#                  NoB Cyber Army                   #"
+    print "#                                                   #"
+    print "#####################################################"
 
-if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser(
-        formatter_class = argparse.RawTextHelpFormatter,
-        description = 'Simple Admin Control Panel finder by Black Python')
-
-    parser.add_argument('-w', '--wordlist', default = None, help = 'The wordlist file which contains all the directory list to try against target site, 1 word a line')
-    parser.add_argument('-s', '--sitelist', default = None, help = 'The file which contains all the target sites, 1 site a line.')
-
-    args = parser.parse_args()
-
-    if args.wordlist is None: exit("[!] You must specify a valid wordlist\n")
-    elif args.sitelist is None: exit("[!] You must specify a valid sitelist\n")
-    else: checkAdmin(args.wordlist, args.sitelist)
+banner()
+try:
+    find_admin(raw_input('Wordlist Path: '), raw_input('Sitelist Path: '))
+except KeyboardInterrupt:
+    exit("User exit")

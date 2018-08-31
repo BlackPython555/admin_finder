@@ -1,5 +1,5 @@
 # admin_finder
-a simple tool to find admin control panel, multiple site in one time. provide a wordlist and a site list and it will do it's job
+a simple tool to find admin control panel, multiple site in one time. provide a wordlist and a sites list and it will do it's job
 
 by Black Python from NoB Cyber Army.
 
